@@ -1,11 +1,13 @@
 package main
 
-// #cgo pkg-config: monocypher
-// #include <monocypher.h>
-// #include <monocypher-ed25519.h>
-import "C"
-import "unsafe"
-import "fmt"
+import (
+	// #cgo pkg-config: monocypher
+	// #include <monocypher.h>
+	// #include <monocypher-ed25519.h>
+	"C"
+	"unsafe"
+	"fmt"
+)
 
 func sha512(in []byte) []byte {
 	var ptr unsafe.Pointer
