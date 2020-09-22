@@ -5,7 +5,7 @@ import (
 	// #include <monocypher.h>
 	// #include <monocypher-ed25519.h>
 	"C"
-	"fmt"
+	//"fmt"
 	"unsafe"
 )
 
@@ -123,8 +123,6 @@ func crypto_argon2(size uint, area []byte, blocks uint, iter uint, pswd []byte, 
 func crypto_hchacha20(key []byte, nonce []byte) []byte {
 	var out [32]byte
 
-	fmt.Println(key, nonce)
-
 	C.crypto_hchacha20(
 		(*C.uchar)(&out[0]),
 		(*C.uchar)(&key[0]),
@@ -132,6 +130,7 @@ func crypto_hchacha20(key []byte, nonce []byte) []byte {
 	return out[:]
 }
 
+/*
 func main() {
 	key := make([]byte, 32)
 	nonce := make([]byte, 16)
@@ -140,3 +139,4 @@ func main() {
 	o2 := crypto_hchacha20(key, nonce)
 	fmt.Println(o1, o2)
 }
+*/
