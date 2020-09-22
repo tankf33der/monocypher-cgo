@@ -7,9 +7,10 @@ import (
 	"crypto/hmac"
 	"golang.org/x/crypto/blake2b"
 	"golang.org/x/crypto/chacha20"
+	"golang.org/x/crypto/chacha20poly1305"
 	"math/rand"
 	"time"
-	"fmt"
+	// "fmt"
 )
 
 func TestSha512(t *testing.T) {
@@ -20,12 +21,12 @@ func TestSha512(t *testing.T) {
 		r1 = crypto_sha512(in[:i])
 		r2 = sha512.Sum512(in[:i])
 		if (!bytes.Equal(r1[:], r2[:])) {
-			t.Errorf("fail sha512, in:%v, r1:%v, r2:%v", in[:i], r1, r2)
+			t.Errorf("fail sha512, in:%v", in[:i])
 		}
 	}
 }
 
-func TestHmac(t *testing.T) {
+func TestHmacSha512(t *testing.T) {
 	in := make([]byte, 256)
 	var r1 [64]byte
 	var r2 []byte
@@ -37,7 +38,7 @@ func TestHmac(t *testing.T) {
 			mac.Write(in[:d])
 			r2 = mac.Sum(nil)
 			if (!bytes.Equal(r1[:], r2[:])) {
-				t.Errorf("fail hmac_sha512, in:%v, r1:%v, r2:%v", in[:k], r1, r2)
+				t.Errorf("fail hmac_sha512, in:%v", in[:k])
 			}
 		}
 	}
@@ -56,7 +57,7 @@ func TestBlake2b(t *testing.T) {
 				b.Write(in[:d])
 				r2 = b.Sum(nil)
 				if (!bytes.Equal(r1[:o], r2[:o])) {
-					t.Errorf("fail blake2b, in:%v, r1:%v, r2:%v", in[:k], r1, r2)
+					t.Errorf("fail blake2b, hash_size: %d, in:%v, data:%v", o, in[:k], in[:d])
 				}
 			}
 		}
@@ -69,7 +70,7 @@ func TestHChacha20(t *testing.T) {
 	nonce := make([]byte, 16)
 
 	rand.Seed(time.Now().UnixNano())
-	for i := 0; i < 256; i++ {
+	for i := 0; i < 128; i++ {
 		rand.Read(key)
 		rand.Read(nonce)
 		r1 = crypto_hchacha20(key, nonce)
@@ -82,24 +83,53 @@ func TestHChacha20(t *testing.T) {
 
 func TestXChacha20_ctr(t *testing.T) {
 	var r1, r2 [128]byte
-	//var ctr uint64
 	key := make([]byte, 32)
 	nonce := make([]byte, 24)
 	text := make([]byte, 128)
 
 
 	rand.Seed(time.Now().UnixNano())
-	rand.Read(key)
-	rand.Read(nonce)
-	rand.Read(text)
-	ctr := rand.Uint64()
-	crypto_xchacha20_ctr(r1[:], text, 128, key, nonce, ctr)
-	fmt.Println(r1)
+	for i := 0; i < 128; i++ {
+		rand.Read(key)
+		rand.Read(nonce)
+		rand.Read(text)
+		ctr := rand.Uint32()
 
-	ch, _ := chacha20.NewUnauthenticatedCipher(key, nonce)
-	ch.SetCounter(ctr)
-	ch.XORKeyStream(r2, text)
-	fmt.Println(r2)
-
+		crypto_xchacha20_ctr(r1[:], text, 128, key, nonce, uint64(ctr))
+		ch, _ := chacha20.NewUnauthenticatedCipher(key, nonce)
+		ch.SetCounter(ctr)
+		ch.XORKeyStream(r2[:], text[:])
+		if (!bytes.Equal(r1[:], r2[:])) {
+			t.Errorf("fail xchacha20_ctr key:%v, nonce:%v", key, nonce)
+		}
+	}
 }
 
+func TestLock(t *testing. T) {
+	var r1 [128]byte
+	var r2 []byte
+	var mac1 [16]byte
+
+	key := make([]byte, 32)
+	nonce := make([]byte, 24)
+	text := make([]byte, 128)
+
+	rand.Seed(time.Now().UnixNano())
+	for i := 0; i < 128; i++ {
+		rand.Read(key)
+		rand.Read(nonce)
+		rand.Read(text)
+
+		crypto_lock(mac1[:], r1[:], key, nonce, text, 128)
+
+		aead, _ := chacha20poly1305.NewX(key)
+		r2 = aead.Seal(nil, nonce, text, nil)
+
+		if (!bytes.Equal(mac1[:], r2[len(r2)-16:])) {
+			t.Errorf("fail mac crypto_lock key:%v, nonce:%v, text:%v", key, nonce, text)
+		}
+		if (!bytes.Equal(r1[:], r2[:128])) {
+			t.Errorf("fail crypto crypto_lock key:%v, nonce:%v, text:%v", key, nonce, text)
+		}
+	}
+}

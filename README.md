@@ -13,6 +13,7 @@ $ cp src/optional/monocypher-ed25519.h /usr/local/include # XXX
 $ cd ~
 $ go get "golang.org/x/crypto/blake2b"
 $ go get "golang.org/x/crypto/chacha20"
+$ go get "golang.org/x/crypto/chacha20poly1305"
 $ git clone https://git.envs.net/mpech/monocypher-cgo.git
 $ cd monocypher-cgo
 $ go test -v

@@ -142,6 +142,15 @@ func crypto_xchacha20_ctr(
 		(C.size_t)(ctr))
 }
 
+func crypto_lock(mac []byte, c []byte, key []byte, nonce[]byte, t []byte, size uint64) {
+	C.crypto_lock(
+		(*C.uchar)(&mac[0]),
+		(*C.uchar)(&c[0]),
+		(*C.uchar)(&key[0]),
+		(*C.uchar)(&nonce[0]),
+		(*C.uchar)(&t[0]),
+		(C.size_t)(size))
+}
 /*
 func main() {
 	key := make([]byte, 32)
