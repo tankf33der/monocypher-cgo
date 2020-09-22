@@ -122,7 +122,7 @@ func crypto_argon2(size uint, area []byte, blocks uint, iter uint, pswd []byte, 
 */
 
 func crypto_hchacha20(key []byte, nonce []byte) []byte {
-	var out []byte
+	var out [32]byte
 
 	fmt.Println(key, nonce)
 
@@ -130,7 +130,7 @@ func crypto_hchacha20(key []byte, nonce []byte) []byte {
 		(*C.uchar)(&out[0]),
 		(*C.uchar)(&key[0]),
 		(*C.uchar)(&nonce[0]))
-	return out
+	return out[:]
 }
 
 func main() {
