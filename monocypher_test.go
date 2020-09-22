@@ -74,6 +74,7 @@ func TestHChacha20(t *testing.T) {
 		rand.Read(nonce)
 		r1 = crypto_hchacha20(key, nonce)
 		r2, _ = chacha20.HChaCha20(key, nonce)
+		r1[1] = 11
 		if (!bytes.Equal(r1, r2)) {
 			t.Errorf("fail hchacha20, key:%v, nonce:%v", key, nonce)
 		}
