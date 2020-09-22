@@ -96,7 +96,10 @@ func TestXChacha20_ctr(t *testing.T) {
 	crypto_xchacha20_ctr(r1[:], text, 128, key, nonce, ctr)
 	fmt.Println(r1)
 
-	chacha20.
+	ch, _ := chacha20.NewUnauthenticatedCipher(key, nonce)
+	ch.SetCounter(ctr)
+	ch.XORKeyStream(r2, text)
+	fmt.Println(r2)
 
 }
 
