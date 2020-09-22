@@ -158,12 +158,11 @@ func TestX25519(t *testing.T) {
 }
 
 func TestEd25519PublicKey(t *testing.T) {
-	var prv []byte
-	var pub [32]byte
+	var prv, pub []byte
 
 	for i := 0; i < 256; i++ {
 		_, prv, _ = ed25519.GenerateKey(nil)
-		crypto_ed25519_public_key(pub[:], prv[:32])
+		pub = crypto_ed25519_public_key(prv[:32])
 		if (!bytes.Equal(pub[:], prv[32:])) {
 			t.Errorf("fail ed25519 public key: prv:%v", prv)
 		}

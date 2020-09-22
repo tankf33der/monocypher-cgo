@@ -165,10 +165,33 @@ func crypto_x25519_public_key(out []byte, prv []byte) {
 		(*C.uchar)(&prv[0]))
 }
 
-func crypto_ed25519_public_key(out []byte, prv []byte) {
+func crypto_ed25519_public_key(prv []byte) []byte{
+	var out [32]byte
 	C.crypto_ed25519_public_key(
 		(*C.uchar)(&out[0]),
 		(*C.uchar)(&prv[0]))
+	return out[:]
+}
+
+func crypto_ed25519_sign(
+	out []byte, prv []byte, pub []byte, data []byte, size uint64) []byte {
+
+	var data_ptr unsafe.Pointer
+	var data_len = len(data)
+
+	if (data_len > 0) {
+		data_ptr = unsafe.Pointer(&data[0])
+	} else {
+		data_ptr = unsafe.Pointer(&data)
+	}
+
+	C.crypto_ed25519_sign(
+		(*C.uchar)(&out[0]),
+		(*C.uchar)(&prv[0]),
+		(*C.uchar)(&pub[0]),
+		(*C.uchar)(data_ptr),
+		(C.size_t)(size))
+	return out[:]
 }
 
 /*
