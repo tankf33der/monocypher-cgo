@@ -10,8 +10,7 @@ $ git clone https://github.com/LoupVaillant/Monocypher.git
 $ cd Monocypher
 $ make test
 $ make USE_ED25519=true
-$ sudo make install
-$ cp src/optional/monocypher-ed25519.h /usr/local/include # XXX
+$ make install USE_ED25519=true
 $ cd ~
 $ go get "golang.org/x/crypto/blake2b"
 $ go get "golang.org/x/crypto/chacha20"
