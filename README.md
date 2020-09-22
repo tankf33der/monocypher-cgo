@@ -2,6 +2,8 @@ Lets try to test [monocypher](https://monocypher.org/) library
 via [cgo](https://golang.org/cmd/cgo/) against
 golang's [crypto](https://golang.org/pkg/crypto/) standart library.
 
+Target host: Linux, x64, go 1.15.2
+
 How to repeat:
 ```
 $ git clone https://github.com/LoupVaillant/Monocypher.git
@@ -41,5 +43,7 @@ PASS
 ok  	_/home/mpech/monocypher-cgo	3.542s
 $
 ```
+
+
 
 Have fun.
