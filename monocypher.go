@@ -83,14 +83,13 @@ func crypto_blake2b_general(size int, key []byte, data []byte) []byte {
 }
 
 /*
-
 // XXX, deep fatal error of golang and cgo (cannot use _cgo2)
 // lets skip for now:
 // ./monocypher.go:112:3: cannot use _cgo2 (type *_Ctype_uchar) as type unsafe.Pointer in argument to _Cfunc_crypto_argon2i
 // sep.2020, go version go1.15.2 linux/amd64
 //
 func crypto_argon2(size uint, area []byte, blocks uint, iter uint, pswd []byte, salt []byte) []byte {
-	var out []byte
+	var out [64]byte
 	var pswd_ptr, salt_ptr unsafe.Pointer
 	var pswd_len = len(pswd)
 	var salt_len = len(salt)
