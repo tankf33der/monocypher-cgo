@@ -54,7 +54,7 @@ func crypto_hmac_sha512(key []byte, data []byte) [64]byte {
 	return out
 }
 
-func crypto_blake2b_general(size int, key []byte, data []byte) []byte {
+func crypto_blake2b_general(size uint64, key []byte, data []byte) []byte {
 	var out [64]byte
 	var key_ptr, data_ptr unsafe.Pointer
 	var key_len = len(key)
@@ -128,6 +128,18 @@ func crypto_hchacha20(key []byte, nonce []byte) []byte {
 		(*C.uchar)(&key[0]),
 		(*C.uchar)(&nonce[0]))
 	return out[:]
+}
+
+func crypto_xchacha20_ctr(
+	c []byte, t []byte, size uint64, key []byte, nonce []byte, ctr uint64) {
+
+	C.crypto_xchacha20_ctr(
+		(*C.uchar)(&c[0]),
+		(*C.uchar)(&t[0]),
+		(C.size_t)(size),
+		(*C.uchar)(&key[0]),
+		(*C.uchar)(&nonce[0]),
+		(C.size_t)(ctr))
 }
 
 /*

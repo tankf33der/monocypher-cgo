@@ -9,7 +9,7 @@ import (
 	"golang.org/x/crypto/chacha20"
 	"math/rand"
 	"time"
-	//"fmt"
+	"fmt"
 )
 
 func TestSha512(t *testing.T) {
@@ -51,7 +51,7 @@ func TestBlake2b(t *testing.T) {
 	for o := 1; o < 64; o++ {
 		for d := 0; d < 128; d++ {
 			for k := 0; k < 64; k++ {
-				r1 = crypto_blake2b_general(o, in[:k], in[:d])
+				r1 = crypto_blake2b_general(uint64(o), in[:k], in[:d])
 				b, _ := blake2b.New(o, in[:k])
 				b.Write(in[:d])
 				r2 = b.Sum(nil)
@@ -79,3 +79,24 @@ func TestHChacha20(t *testing.T) {
 		}
 	}
 }
+
+func TestXChacha20_ctr(t *testing.T) {
+	var r1, r2 [128]byte
+	//var ctr uint64
+	key := make([]byte, 32)
+	nonce := make([]byte, 24)
+	text := make([]byte, 128)
+
+
+	rand.Seed(time.Now().UnixNano())
+	rand.Read(key)
+	rand.Read(nonce)
+	rand.Read(text)
+	ctr := rand.Uint64()
+	crypto_xchacha20_ctr(r1[:], text, 128, key, nonce, ctr)
+	fmt.Println(r1)
+
+	chacha20.
+
+}
+
