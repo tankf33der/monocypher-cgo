@@ -174,8 +174,9 @@ func crypto_ed25519_public_key(prv []byte) []byte{
 }
 
 func crypto_ed25519_sign(
-	out []byte, prv []byte, pub []byte, data []byte, size uint64) []byte {
+	prv []byte, pub []byte, data []byte, size uint64) []byte {
 
+	var out [64]byte
 	var data_ptr unsafe.Pointer
 	var data_len = len(data)
 
@@ -194,13 +195,37 @@ func crypto_ed25519_sign(
 	return out[:]
 }
 
-/*
-func main() {
-	key := make([]byte, 32)
-	nonce := make([]byte, 16)
+func crypto_ed25519_check(sig []byte, pub []byte, data []byte, size uint64) int {
+	var data_ptr unsafe.Pointer
+	var data_len = len(data)
 
-	o1 := crypto_hchacha20(key[:], nonce[:])
-	o2 := crypto_hchacha20(key, nonce)
-	fmt.Println(o1, o2)
+	if (data_len > 0) {
+		data_ptr = unsafe.Pointer(&data[0])
+	} else {
+		data_ptr = unsafe.Pointer(&data)
+	}
+	return int(C.crypto_ed25519_check(
+		(*C.uchar)(&sig[0]),
+		(*C.uchar)(&pub[0]),
+		(*C.uchar)(data_ptr),
+		(C.size_t)(size)))
 }
-*/
+
+func crypto_poly1305(data []byte, size uint64, key []byte) []byte {
+	var out [16]byte
+	var data_ptr unsafe.Pointer
+	var data_len = len(data)
+
+	if (data_len > 0) {
+		data_ptr = unsafe.Pointer(&data[0])
+	} else {
+		data_ptr = unsafe.Pointer(&data)
+	}
+
+	C.crypto_poly1305(
+		(*C.uchar)(&out[0]),
+		(*C.uchar)(data_ptr),
+		(C.size_t)(size),
+		(*C.uchar)(&key[0]))
+	return out[:]
+}

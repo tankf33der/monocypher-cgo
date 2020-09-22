@@ -15,6 +15,7 @@ $ go get "golang.org/x/crypto/blake2b"
 $ go get "golang.org/x/crypto/chacha20"
 $ go get "golang.org/x/crypto/chacha20poly1305"
 $ go get "golang.org/x/crypto/curve25519"
+$ go get "golang.org/x/crypto/poly1305"
 $ git clone https://git.envs.net/mpech/monocypher-cgo.git
 $ cd monocypher-cgo
 $ go test -v

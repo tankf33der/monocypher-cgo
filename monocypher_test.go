@@ -10,9 +10,9 @@ import (
 	"golang.org/x/crypto/chacha20"
 	"golang.org/x/crypto/chacha20poly1305"
 	"golang.org/x/crypto/curve25519"
+	"golang.org/x/crypto/poly1305"
 	"math/rand"
 	"time"
-	// "fmt"
 )
 
 func TestSha512(t *testing.T) {
@@ -157,14 +157,52 @@ func TestX25519(t *testing.T) {
 	}
 }
 
-func TestEd25519PublicKey(t *testing.T) {
+func TestEd25519All(t *testing.T) {
 	var prv, pub []byte
+	var text [128]byte
 
-	for i := 0; i < 256; i++ {
-		_, prv, _ = ed25519.GenerateKey(nil)
-		pub = crypto_ed25519_public_key(prv[:32])
-		if (!bytes.Equal(pub[:], prv[32:])) {
-			t.Errorf("fail ed25519 public key: prv:%v", prv)
+	rand.Seed(time.Now().UnixNano())
+	rand.Read(text[:])
+	_, prv, _ = ed25519.GenerateKey(nil)
+	pub = crypto_ed25519_public_key(prv[:32])
+	// public_key
+	if (!bytes.Equal(pub[:], prv[32:])) {
+		t.Errorf("fail ed25519 public key: prv:%v", prv)
+	}
+
+	for i := 0; i < 128; i++ {
+		sg1 := crypto_ed25519_sign(prv[:32], pub, text[:i], uint64(i))
+		sg2 := ed25519.Sign(prv, text[:i])
+		// sign
+		if (!bytes.Equal(sg1, sg2)) {
+			t.Errorf("fail ed25519 sign: prv:%v, text:%v", prv, text[:i])
+		}
+
+		// XXX, sg1 and sg2 crossed
+		r1 := crypto_ed25519_check(sg2, pub, text[:i], uint64(i))
+		r2 := ed25519.Verify(prv[32:], text[:i], sg1)
+
+		// verify
+		if (!r2 && r1 != 0) {
+			t.Errorf("fail ed25519 verify: prv:%v, text:%v, sg1:%v, sg2:%v", prv, text[:i], sg1, sg2)
+		}
+	}
+}
+
+func TestPoly1305(t *testing.T) {
+	var text [128]byte
+	var key [32]byte
+	var r2 [16]byte
+
+	rand.Seed(time.Now().UnixNano())
+	rand.Read(key[:])
+
+	// one key for all
+	for i := 0; i < 128; i++ {
+		r1 := crypto_poly1305(text[:i], uint64(i), key[:])
+		poly1305.Sum(&r2, text[:i], &key)
+		if (!bytes.Equal(r1[:], r2[:])) {
+			t.Errorf("fail poly1305: key:%v, text:%v", key, text[:i])
 		}
 	}
 }
