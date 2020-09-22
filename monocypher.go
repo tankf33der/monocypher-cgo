@@ -5,7 +5,7 @@ import (
 	// #include <monocypher.h>
 	// #include <monocypher-ed25519.h>
 	"C"
-	// "fmt"
+	"fmt"
 	"unsafe"
 )
 
@@ -121,16 +121,23 @@ func crypto_argon2(size uint, area []byte, blocks uint, iter uint, pswd []byte, 
 }
 */
 
-/*
-func main() {
-	var o [64]byte
+func crypto_hchacha20(key []byte, nonce []byte) []byte {
+	var out []byte
 
-	r := []byte{1,1,1,1}
-	o = crypto_sha512(r[:0])
-	o = crypto_sha512(r[:2])
-	fmt.Println(o)
+	fmt.Println(key, nonce)
+
+	C.crypto_hchacha20(
+		(*C.uchar)(&out[0]),
+		(*C.uchar)(&key[0]),
+		(*C.uchar)(&nonce[0]))
+	return out
 }
-*/
 
+func main() {
+	key := make([]byte, 32)
+	nonce := make([]byte, 16)
 
-
+	o1 := crypto_hchacha20(key[:], nonce[:])
+	o2 := crypto_hchacha20(key, nonce)
+	fmt.Println(o1, o2)
+}

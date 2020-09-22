@@ -5,8 +5,11 @@ import (
 	"bytes"
 	"crypto/sha512"
 	"crypto/hmac"
-	//"crypto/blake2b"
 	"golang.org/x/crypto/blake2b"
+	//"golang.org/x/crypto/chacha20"
+	"math/rand"
+	"time"
+	"fmt"
 )
 
 func TestSha512(t *testing.T) {
@@ -58,5 +61,22 @@ func TestBlake2b(t *testing.T) {
 			}
 		}
 	}
+}
+
+func TestHChacha20(t *testing.T) {
+	//var r1, r2 []byte
+	key := make([]byte, 32)
+	nonce := make([]byte, 16)
+
+	rand.Seed(time.Now().UnixNano())
+	for i := 0; i < 2; i++ {
+		rand.Read(key)
+		rand.Read(nonce)
+		fmt.Println(key, nonce)
+		_ = crypto_hchacha20(key, nonce)
+		//fmt.Println(r1, r2)
+	}
+
+	//in := make([]
 
 }

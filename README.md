@@ -11,8 +11,8 @@ $ make USE_ED25519=true
 $ sudo make install
 $ cp src/optional/monocypher-ed25519.h /usr/local/include # XXX
 $ cd ~
-$ go get "golang.org/x/crypto/argon2"
 $ go get "golang.org/x/crypto/blake2b"
+$ go get "golang.org/x/crypto/chacha20"
 $ git clone https://git.envs.net/mpech/monocypher-cgo.git
 $ cd monocypher-cgo
 $ go test -v
