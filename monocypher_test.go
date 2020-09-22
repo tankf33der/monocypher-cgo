@@ -3,11 +3,13 @@ package main
 import (
 	"testing"
 	"bytes"
+	"crypto/ed25519"
 	"crypto/sha512"
 	"crypto/hmac"
 	"golang.org/x/crypto/blake2b"
 	"golang.org/x/crypto/chacha20"
 	"golang.org/x/crypto/chacha20poly1305"
+	"golang.org/x/crypto/curve25519"
 	"math/rand"
 	"time"
 	// "fmt"
@@ -70,7 +72,7 @@ func TestHChacha20(t *testing.T) {
 	nonce := make([]byte, 16)
 
 	rand.Seed(time.Now().UnixNano())
-	for i := 0; i < 128; i++ {
+	for i := 0; i < 1024; i++ {
 		rand.Read(key)
 		rand.Read(nonce)
 		r1 = crypto_hchacha20(key, nonce)
@@ -89,7 +91,7 @@ func TestXChacha20_ctr(t *testing.T) {
 
 
 	rand.Seed(time.Now().UnixNano())
-	for i := 0; i < 128; i++ {
+	for i := 0; i < 1024; i++ {
 		rand.Read(key)
 		rand.Read(nonce)
 		rand.Read(text)
@@ -115,7 +117,7 @@ func TestLock(t *testing. T) {
 	text := make([]byte, 128)
 
 	rand.Seed(time.Now().UnixNano())
-	for i := 0; i < 128; i++ {
+	for i := 0; i < 1024; i++ {
 		rand.Read(key)
 		rand.Read(nonce)
 		rand.Read(text)
@@ -130,6 +132,40 @@ func TestLock(t *testing. T) {
 		}
 		if (!bytes.Equal(r1[:], r2[:128])) {
 			t.Errorf("fail crypto crypto_lock key:%v, nonce:%v, text:%v", key, nonce, text)
+		}
+	}
+}
+
+func TestX25519(t *testing.T) {
+	var prv1, pub1 [32]byte
+	var prv2, pub2 [32]byte
+	var sh1 [32]byte
+
+	rand.Seed(time.Now().UnixNano())
+	for i := 0; i < 1024; i++ {
+		rand.Read(prv1[:])
+		rand.Read(prv2[:])
+
+		crypto_x25519_public_key(pub1[:], prv1[:])
+		curve25519.ScalarBaseMult(&pub2, &prv2)
+
+		crypto_x25519(sh1[:], prv1[:], pub2[:])
+		sh2, _ := curve25519.X25519(prv2[:], pub1[:])
+		if (!bytes.Equal(sh1[:], sh2[:])) {
+			t.Errorf("fail x25519: pub1:%v, prv1:%v, pub2:%v, prv2:%v", pub1, prv1, pub2, prv2)
+		}
+	}
+}
+
+func TestEd25519PublicKey(t *testing.T) {
+	var prv []byte
+	var pub [32]byte
+
+	for i := 0; i < 256; i++ {
+		_, prv, _ = ed25519.GenerateKey(nil)
+		crypto_ed25519_public_key(pub[:], prv[:32])
+		if (!bytes.Equal(pub[:], prv[32:])) {
+			t.Errorf("fail ed25519 public key: prv:%v", prv)
 		}
 	}
 }

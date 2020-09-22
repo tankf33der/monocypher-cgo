@@ -151,6 +151,26 @@ func crypto_lock(mac []byte, c []byte, key []byte, nonce[]byte, t []byte, size u
 		(*C.uchar)(&t[0]),
 		(C.size_t)(size))
 }
+
+func crypto_x25519(out []byte, prv []byte, pub []byte) {
+	C.crypto_x25519(
+		(*C.uchar)(&out[0]),
+		(*C.uchar)(&prv[0]),
+		(*C.uchar)(&pub[0]))
+}
+
+func crypto_x25519_public_key(out []byte, prv []byte) {
+	C.crypto_x25519_public_key(
+		(*C.uchar)(&out[0]),
+		(*C.uchar)(&prv[0]))
+}
+
+func crypto_ed25519_public_key(out []byte, prv []byte) {
+	C.crypto_ed25519_public_key(
+		(*C.uchar)(&out[0]),
+		(*C.uchar)(&prv[0]))
+}
+
 /*
 func main() {
 	key := make([]byte, 32)
