@@ -5,7 +5,6 @@ import (
 	// #include <monocypher.h>
 	// #include <monocypher-ed25519.h>
 	"C"
-	//"fmt"
 	"unsafe"
 )
 

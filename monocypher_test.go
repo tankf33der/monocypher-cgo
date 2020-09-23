@@ -83,7 +83,6 @@ func TestHChacha20(t *testing.T) {
 	}
 }
 
-/*
 func TestXChacha20_ctr(t *testing.T) {
 	var r1, r2 [128]byte
 	key := make([]byte, 32)
@@ -107,7 +106,6 @@ func TestXChacha20_ctr(t *testing.T) {
 		}
 	}
 }
-*/
 
 func TestLock(t *testing. T) {
 	var r1 [128]byte
