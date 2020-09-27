@@ -19,6 +19,8 @@ func TestSha512(t *testing.T) {
 	in := make([]byte, 1024)
 	var r1, r2 [64]byte
 
+	rand.Seed(time.Now().UnixNano())
+	rand.Read(in)
 	for i := 0; i < 1024; i++ {
 		r1 = crypto_sha512(in[:i])
 		r2 = sha512.Sum512(in[:i])
@@ -33,6 +35,8 @@ func TestHmacSha512(t *testing.T) {
 	var r1 [64]byte
 	var r2 []byte
 
+	rand.Seed(time.Now().UnixNano())
+	rand.Read(in)
 	for d := 0; d < 256; d++ {
 		for k := 0; k < 256; k++ {
 			r1 = crypto_hmac_sha512(in[:k], in[:d])
@@ -51,6 +55,8 @@ func TestBlake2b(t *testing.T) {
 	var r1 []byte
 	var r2 []byte
 
+	rand.Seed(time.Now().UnixNano())
+	rand.Read(in)
 	for o := 1; o < 64; o++ {
 		for d := 0; d < 128; d++ {
 			for k := 0; k < 64; k++ {
@@ -179,10 +185,10 @@ func TestEd25519All(t *testing.T) {
 		}
 
 		// XXX, sg1 and sg2 crossed
+		// verify
 		r1 := crypto_ed25519_check(sg2, pub, text[:i], uint64(i))
 		r2 := ed25519.Verify(prv[32:], text[:i], sg1)
 
-		// verify
 		if (!r2 && r1 != 0) {
 			t.Errorf("fail ed25519 verify: prv:%v, text:%v, sg1:%v, sg2:%v", prv, text[:i], sg1, sg2)
 		}
@@ -196,6 +202,7 @@ func TestPoly1305(t *testing.T) {
 
 	rand.Seed(time.Now().UnixNano())
 	rand.Read(key[:])
+	rand.Read(text[:])
 
 	// one key for all
 	for i := 0; i < 128; i++ {
