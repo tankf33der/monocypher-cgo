@@ -51,14 +51,14 @@ func TestHmacSha512(t *testing.T) {
 }
 
 func TestBlake2b(t *testing.T) {
-	in := make([]byte, 128)
+	in := make([]byte, 256)
 	var r1 []byte
 	var r2 []byte
 
 	rand.Seed(time.Now().UnixNano())
 	rand.Read(in)
 	for o := 1; o < 64; o++ {
-		for d := 0; d < 128; d++ {
+		for d := 0; d < 256; d++ {
 			for k := 0; k < 64; k++ {
 				r1 = crypto_blake2b_general(uint64(o), in[:k], in[:d])
 				b, _ := blake2b.New(o, in[:k])
@@ -148,7 +148,7 @@ func TestX25519(t *testing.T) {
 	var sh1 [32]byte
 
 	rand.Seed(time.Now().UnixNano())
-	for i := 0; i < 1024; i++ {
+	for i := 0; i < 4096; i++ {
 		rand.Read(prv1[:])
 		rand.Read(prv2[:])
 
@@ -165,7 +165,7 @@ func TestX25519(t *testing.T) {
 
 func TestEd25519All(t *testing.T) {
 	var prv, pub []byte
-	var text [128]byte
+	var text [1024]byte
 
 	rand.Seed(time.Now().UnixNano())
 	rand.Read(text[:])
@@ -176,7 +176,7 @@ func TestEd25519All(t *testing.T) {
 		t.Errorf("fail ed25519 public key: prv:%v", prv)
 	}
 
-	for i := 0; i < 128; i++ {
+	for i := 0; i < 1024; i++ {
 		sg1 := crypto_ed25519_sign(prv[:32], pub, text[:i], uint64(i))
 		sg2 := ed25519.Sign(prv, text[:i])
 		// sign
@@ -196,7 +196,7 @@ func TestEd25519All(t *testing.T) {
 }
 
 func TestPoly1305(t *testing.T) {
-	var text [128]byte
+	var text [1024]byte
 	var key [32]byte
 	var r2 [16]byte
 
@@ -205,7 +205,7 @@ func TestPoly1305(t *testing.T) {
 	rand.Read(text[:])
 
 	// one key for all
-	for i := 0; i < 128; i++ {
+	for i := 0; i < 1024; i++ {
 		r1 := crypto_poly1305(text[:i], uint64(i), key[:])
 		poly1305.Sum(&r2, text[:i], &key)
 		if (!bytes.Equal(r1[:], r2[:])) {
