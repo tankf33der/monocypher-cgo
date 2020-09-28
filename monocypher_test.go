@@ -169,17 +169,17 @@ func TestEd25519All(t *testing.T) {
 
 	rand.Seed(time.Now().UnixNano())
 	rand.Read(text[:])
-	_, prv, _ = ed25519.GenerateKey(nil)
-	pub = crypto_ed25519_public_key(prv[:32])
-	// public_key
-	if (!bytes.Equal(pub[:], prv[32:])) {
-		t.Errorf("fail ed25519 public key: prv:%v", prv)
-	}
-
 	for i := 0; i < 1024; i++ {
+		// public_key
+		_, prv, _ = ed25519.GenerateKey(nil)
+		pub = crypto_ed25519_public_key(prv[:32])
+		if (!bytes.Equal(pub[:], prv[32:])) {
+			t.Errorf("fail ed25519 public key: prv:%v", prv)
+		}
+
+		// sign
 		sg1 := crypto_ed25519_sign(prv[:32], pub, text[:i], uint64(i))
 		sg2 := ed25519.Sign(prv, text[:i])
-		// sign
 		if (!bytes.Equal(sg1, sg2)) {
 			t.Errorf("fail ed25519 sign: prv:%v, text:%v", prv, text[:i])
 		}
@@ -201,11 +201,11 @@ func TestPoly1305(t *testing.T) {
 	var r2 [16]byte
 
 	rand.Seed(time.Now().UnixNano())
-	rand.Read(key[:])
 	rand.Read(text[:])
 
-	// one key for all
 	for i := 0; i < 1024; i++ {
+		rand.Read(key[:])
+
 		r1 := crypto_poly1305(text[:i], uint64(i), key[:])
 		poly1305.Sum(&r2, text[:i], &key)
 		if (!bytes.Equal(r1[:], r2[:])) {
